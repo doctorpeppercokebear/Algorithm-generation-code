@@ -8,7 +8,7 @@ def step1_learning():
     X = np.array([[1, 1], [1, 0], [0,1], [0,0]])  #열 백터
     y = np.array([1, -1, -1, -1])  # end  #행 백터
     # 퍼셉트론 객체 선언
-    ppn = Perceptron(eta=0.1)
+    ppn = Perceptron(eta=0.1)   #ppn: 인스턴스
     #학습
     s_time = time()
     ppn.fit(X, y)
