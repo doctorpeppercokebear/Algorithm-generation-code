@@ -20,7 +20,7 @@ def step1_get_data():
     iris = datasets.load_iris()
     # print(iris) # 딕셔너리 타입 
     X = iris.data[:100, [2, 3]]
-    y = iris.target_names[:100]
+    y = iris.target[:100]
     names = iris.target_names[:100]
     # print(X)
     # print(y)
@@ -68,5 +68,5 @@ def step3_using():
 
 if __name__ == '__main__':
     # step1_get_data()
-    step2_learning()
-    # step3_using()
+    # step2_learning()
+    step3_using()
