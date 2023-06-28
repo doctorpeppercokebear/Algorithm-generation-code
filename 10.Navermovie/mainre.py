@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from time import sleep
 import pandas as pd
 import re
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 def step1_get_data():
     # 영화 코드 목록 만들기
@@ -52,18 +54,56 @@ def step1_get_data():
                 # print('좋아요 : ',div3[8].find('em').get_text()) # 좋아요 
                 star =  div3[5].get_text()
                 review = div3[6].get_text()
+                reviw = review.replace(',', '')
                 # good = div3[8].find('em').get_text()
                 df = df.append([[name, code, star, review]], ignore_index=True)
+
         # 저장
         if check_save == False: # 첫 번째 저장
             df.columns = ['name', 'code', 'star', 'review']
-            df.to_csv('movie_data.csv', encoding='utf-8', index=False)
+            df.to_csv('10.Navermovie/movie_data.csv', encoding='utf-8', index=False)
             check_save = True    
         else: # 두 번째 이후 저장
-            df.to_csv('movie_data.csv', encoding='utf-8', index=False,
+            df.to_csv('10.Navermovie/movie_data.csv', encoding='utf-8', index=False,
                     mode='a', header=False)
         count += 1
-        print('진행중 :', count)             
+        print('진행중 :', count) 
+
+#별점 처리 함수
+def star_preprocessing(text):
+    value = float(text)
+    if value > 2.5:
+        return 1
+    else:
+        return '0'
+def review_preprocessing(text):
+    if text.startswith('관람객'):
+        new_str = text[:3]
+        return new_str
+    else:
+        return text
+
+def step2_preprocessing():
+    df = pd.read_csv('10.Navermovie/naver_star.csv', encoding='utf-8')
+    # 랜덤하게 섞기
+    np.random.seed(0)
+    df = df.reindex(np.random.permutation(df.index))
+    #전처리
+    df['star'] = df['star'].apply(star_preprocessing)
+    review_list = df['review'].tolist()
+    star_list = df['star'].tolist()
+    X_train, X_test, y_train, y_test = train_test_split(review_list, star_list, test_size=0.2, random_state=0)
+    # print(len(X_train), len(X_test), len(y_train), len(y_test))
+
+    # 학습, 테스트 데이타 저장
+    dic_train = {'review': X_train, 'star': y_train}
+    df_train = pd.DataFrame(dic_train)
+    dic_test = {'review': X_test, 'star': y_test}
+    df_test = pd.DataFrame(dic_test)
+    df_train.to_csv('naver_train.csv', encoding='utf-8-sig', index=False)
+    df_test.to_csv('naver_test.csv', encoding='utf-8-sig', index=False)
+
 
 if __name__ == '__main__':
-    step1_get_data()
+    # step1_get_data()
+    step2_preprocessing()
