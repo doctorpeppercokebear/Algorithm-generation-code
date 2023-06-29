@@ -6,6 +6,14 @@ import re
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+def is_float(n):
+    try:
+        float(n)
+    except ValueError:
+        return 0
+    else:
+        return float(n)
+    
 def step1_get_data():
     # 영화 코드 목록 만들기
     site1 = 'https://pedia.watcha.com/ko-KR/?domain=movie'
@@ -72,7 +80,7 @@ def step1_get_data():
 #별점 처리 함수
 def star_preprocessing(text):
     value = float(text)
-    if value > 2.5:
+    if value > 5:
         return 1
     else:
         return '0'
@@ -100,10 +108,67 @@ def step2_preprocessing():
     df_train = pd.DataFrame(dic_train)
     dic_test = {'review': X_test, 'star': y_test}
     df_test = pd.DataFrame(dic_test)
-    df_train.to_csv('naver_train.csv', encoding='utf-8-sig', index=False)
-    df_test.to_csv('naver_test.csv', encoding='utf-8-sig', index=False)
+    df_train.to_csv('10.Navermovie/naver_train.csv', encoding='utf-8-sig', index=False)
+    df_test.to_csv('10.Navermovie/naver_test.csv', encoding='utf-8-sig', index=False)
 
+# 형태소 분석기를 이용한 단어 분리
+from konlpy.tag import Okt
+from konlpy.tag import Kkma
+
+okt = Okt()
+kkma = Kkma
+
+def tokenizer_morphs(text):
+    return okt.morphs(text)
+
+def step3_tokenizer():
+    # text = '아버지가방에들어가신다.'
+    # print(tokenizer_morphs(text))
+    train_df = pd.read_csv('10.Navermovie/naver_train.csv', encoding='utf-8-sig')
+    train_df['review_token'] = train_df['review'].apply(tokenizer_morphs)
+    print(train_df['review_token'].head())
+
+from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score
+import pickle
+from time import time
+
+def step4_learnig():
+    train_df = pd.read_csv('10.Navermovie/naver_train.csv',  encoding='utf-8-sig')
+    test_df = pd.read_csv('10.Navermovie/naver_train.csv',  encoding='utf-8-sig')
+    X_train = train_df['review'].tolist()
+    y_train= train_df['star'].tolist()
+    X_test = test_df['review'].tolist()
+    y_test = test_df['star'].tolist()
+    # 학습에 필요한 객체 생성
+    tfidf = TfidfVectorizer(lowercase=False, tokenizer=tokenizer_morphs)
+    # cv = CountVectorizer(lowercase=False, token=tokenizer_morphs)
+    logistic = LogisticRegression(C=10.0, penalty='l2', random_state=0)
+    # sgd = SGDClassifier(loss='log', penalty='l2', random_state=0)
+    pipe = Pipeline([('tfidf', tfidf), ('logistic', logistic)])
+
+    # 학습
+    stime = time()
+    print('학습시작')
+    pipe.fit(X_train, y_train)
+    print('학습종료')
+    etime = time()
+    print('학습 시간 : %d' % (etime-stime))
+
+    # 테스트
+    y_pred = pipe.predict(X_test)
+    print('정확도 : %.3f' % accuracy_score(y_test, y_pred))
+
+    # 객체저장
+    with open('pipe.dat', 'wb') as fp:
+        pickle.dump(pipe, fp)
+    print('객체 저장 완료')
 
 if __name__ == '__main__':
     # step1_get_data()
-    step2_preprocessing()
+    # step2_preprocessing()
+    # step3_tokenizer()
+    step4_learnig()

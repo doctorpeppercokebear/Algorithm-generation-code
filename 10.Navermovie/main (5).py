@@ -4,6 +4,15 @@ from time import sleep
 import pandas as pd
 import re
 
+def is_float(n):
+    try:
+        float(n)
+    except ValueError:
+        return 0
+    else:
+        return float(n)
+        
+
 def step1_get_data():
     # 영화 코드 목록 만들기
     site1 = 'https://pedia.watcha.com/ko-KR/?domain=movie'
@@ -51,6 +60,7 @@ def step1_get_data():
                 # print('리뷰 : ', div3[6].get_text())
                 # print('좋아요 : ', div3[8].find('em').get_text())
                 star = div3[5].get_text()
+                star = is_float(star)
                 review = div3[6].get_text()
                 # good = div3[8].find('em').get_text()
                 df = df.append([[name, code, star, review]], ignore_index=True)
