@@ -9,27 +9,28 @@ import pandas as pd
 from perceptron import Perceptron  # perceptron.py를 복사해서 경로를 같게 해서 불어왔다
 import pickle
 
+
 def step1_get_data():
     # iris data를 파일에서 읽어옴
-    df = pd.read_csv('./3.IrisPerceptron/iris.data', header= None)
+    df = pd.read_csv("./3.IrisPerceptron/iris.data", header=None)
     print(df.head())
 
-# def step2_learning():
-#     pass
+    # def step2_learning():
+    #     pass
 
-# def step3_using():
-#     pass
-
+    # def step3_using():
+    #     pass
 
     # 꽃잎 데이터 추출
     X = df.iloc[:100, [2, 3]].values
     # print(X)
-    
+
     # 꽃 종류 (종속데이터)
     y = df.iloc[:100, 4]
-    y = np.where(y == 'Iris-setosa', 1, -1)
+    y = np.where(y == "Iris-setosa", 1, -1)
     # print(y)
     return X, y
+
 
 def step2_learning():
     ppn = Perceptron(eta=0.1)
@@ -38,27 +39,28 @@ def step2_learning():
     ppn.fit(X, y)
     print(ppn.w_)
     # 학습된  데이터 저장
-    with open('./3.IrisPerceptron/perceptron.iris', 'wb') as fp:
+    with open("./3.IrisPerceptron/perceptron.iris", "wb") as fp:
         pickle.dump(ppn, fp)
-    print('학습완료')
+    print("학습완료")
+
 
 def step3_using():
     # 저장된 모델 불러오기
-    with open('./3.IrisPerceptron/perceptron.iris', 'rb') as fp:
+    with open("./3.IrisPerceptron/perceptron.iris", "rb") as fp:
         ppn = pickle.load(fp)
     while True:
-        a1 = input('꽃잎의 길이를 입력하세요:')
-        a2 = input('꽃잎의 너비를 입력하세요:')
+        a1 = input("꽃잎의 길이를 입력하세요:")
+        a2 = input("꽃잎의 너비를 입력하세요:")
         X = np.array([float(a1), float(a2)])
         # print(X)
         result = ppn.predict(X)
         if result == 1:
-            print('Iris-setoda')
+            print("Iris-setoda")
         else:
-            print('Iris-versicolor')
+            print("Iris-versicolor")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # step1_get_data()
     # step2_learning()
     step3_using()

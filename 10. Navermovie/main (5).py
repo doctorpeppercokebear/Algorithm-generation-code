@@ -4,6 +4,7 @@ from time import sleep
 import pandas as pd
 import re
 
+
 def is_float(n):
     try:
         float(n)
@@ -11,11 +12,11 @@ def is_float(n):
         return 0
     else:
         return float(n)
-        
+
 
 def step1_get_data():
     # 영화 코드 목록 만들기
-    site1 = 'https://pedia.watcha.com/ko-KR/?domain=movie'
+    site1 = "https://pedia.watcha.com/ko-KR/?domain=movie"
     # root > div > div.css-1xm32e0 > section > div > section > div:nth-child(6) > div.css-5rbrg6 > div > div.css-awu20a > div > div > ul
     # //*[@id="root"]/div/div[1]/section/div/section/div[6]/div[2]/div/div[1]/div/div/ul
     # css-a19lp3-VisualUl
@@ -23,18 +24,18 @@ def step1_get_data():
     code_movie_list = list()
     name_movie_list = list()
     if res1.status_code == requests.codes.ok:
-        bs1 = BeautifulSoup(res1.text, 'html.parser')
-        ul = bs1.find_all(class_ = re.compile('-VisualUl'))[2]
+        bs1 = BeautifulSoup(res1.text, "html.parser")
+        ul = bs1.find_all(class_=re.compile("-VisualUl"))[2]
         # print(ul)
-        lis = ul.find_all('li')
+        lis = ul.find_all("li")
         # li_a = lis[0].find('a')
         # print(li_a.get('href').split('/')[-1], li_a.get('title'))
         # print(li_a)
         for li in lis:
             # print(li.find('a').get('href').split('/')[-1])
             # print(li.find('a').get('title'))
-            code_movie_list.append(li.find('a').get('href').split('/')[-1])
-            name_movie_list.append(li.find('a').get('title'))
+            code_movie_list.append(li.find("a").get("href").split("/")[-1])
+            name_movie_list.append(li.find("a").get("title"))
 
     # 영화 코드별 리뷰 가져오기
     temp = zip(code_movie_list, name_movie_list)
@@ -44,18 +45,18 @@ def step1_get_data():
     count = 0
     for code, name in temp:
         sleep(0.5)
-        site2 = 'https://pedia.watcha.com/ko-KR/contents/%s/comments' % code
+        site2 = "https://pedia.watcha.com/ko-KR/contents/%s/comments" % code
         print(site2)
         res2 = requests.get(site2)
         if res2.status_code == requests.codes.ok:
-            bs2 = BeautifulSoup(res2.text, 'html.parser')
+            bs2 = BeautifulSoup(res2.text, "html.parser")
             # -CommentLists
-            div1 = bs2.find(class_ = re.compile('-CommentLists'))
+            div1 = bs2.find(class_=re.compile("-CommentLists"))
             # css-bawlbm
             # ul = div1.find('ul')
-            div2s =  div1.find_all(class_ = 'css-bawlbm')
+            div2s = div1.find_all(class_="css-bawlbm")
             for div2 in div2s:
-                div3 = div2.find_all('div')
+                div3 = div2.find_all("div")
                 # print('별점 : ', div3[5].get_text())
                 # print('리뷰 : ', div3[6].get_text())
                 # print('좋아요 : ', div3[8].find('em').get_text())
@@ -65,15 +66,17 @@ def step1_get_data():
                 # good = div3[8].find('em').get_text()
                 df = df.append([[name, code, star, review]], ignore_index=True)
         # 저장
-        if check_save == False: # 첫 번째 저장
-            df.columns = ['name', 'code', 'star','review']
-            df.to_csv('movie_data.csv', encoding='utf-8', index=False)
+        if check_save == False:  # 첫 번째 저장
+            df.columns = ["name", "code", "star", "review"]
+            df.to_csv("movie_data.csv", encoding="utf-8", index=False)
             check_save = True
-        else: # 두번째 이후 저장
-            df.to_csv('movie_data.csv', encoding='utf-8', index=False,
-                      mode='a', header=False)
+        else:  # 두번째 이후 저장
+            df.to_csv(
+                "movie_data.csv", encoding="utf-8", index=False, mode="a", header=False
+            )
         count += 1
-        print('진행중 :', count)
+        print("진행중 :", count)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     step1_get_data()

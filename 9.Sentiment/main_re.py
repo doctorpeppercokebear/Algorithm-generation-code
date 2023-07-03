@@ -20,30 +20,30 @@ import nltk
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import CountVectorizer 
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 import time
 
+
 def step5_using():
-    with open('9.Sentiment/model.pkl', 'rb') as fp:
+    with open("9.Sentiment/model.pkl", "rb") as fp:
         pipeline = pickle.load(fp)
     while True:
-        text = input('영문 리뷰를 입력하세요:')
+        text = input("영문 리뷰를 입력하세요:")
         y = pipeline.predict([text])
         rate = pipeline.predict_proba([text]) * 100
         # print('y:', y)
         # print('rate:', rate)
         rate = np.max(rate)
         if y == 1:
-            print('긍정리뷰')
+            print("긍정리뷰")
         else:
-            print('부정리뷰')
-        print('정확도: ' , round(rate, 2))
+            print("부정리뷰")
+        print("정확도: ", round(rate, 2))
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # step1_get_data()
     # step2_preprocessing()
     # step3_word_tokenizer()
