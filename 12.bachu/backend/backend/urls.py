@@ -22,5 +22,5 @@ from ai.views import ai_rest
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ai/', ai, name='ai'),
-    path('api/ai', ai_rest, name='ai_resst')
+    path('api/ai', ai_rest, name='ai_rest')
 ]

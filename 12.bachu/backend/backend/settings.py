@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework_jwt', # 추가 
     'rest_framework', # 추가 
     'corsheaders', # 추가 
+    'ai'
 
 ]
 
