@@ -7,10 +7,10 @@ import sklearn
 def ai(request):
     return render(request, 'ai.html')
 
-@api_view(['GET'])
+@api_view(['POST'])
 def ai_rest(request):
-    temperature = request.GET.get('temperature')
-    humidity = request.GET.get('humidity')
+    temperature = request.POST.get('temperature')
+    humidity = request.POST.get('humidity')
     # return Response({'message': temperature + ':' + humidity})
     with open('ai/bechu.pkl', 'rb') as fp:
         model = pickle.load(fp)
